@@ -22,14 +22,35 @@ function createGallery(galleryItems) {
     .join("");
 }
 
-galleryContainer.addEventListener("click", onGalleryContainerClick);
+galleryContainer.addEventListener("click", onGalleryImageClick);
 
-function onGalleryContainerClick(event) {
+function onGalleryImageClick(event) {
+  event.preventDefault();
   const isGalleryImage = event.target.classList.contains("gallery__image");
   if (!isGalleryImage) {
     return;
   }
-  const imageUrl = event.target.src;
+  const imageUrl = event.target.dataset.source;
 
-  console.log(imageUrl);
+  const instance = basicLightbox.create(
+    `
+		<img src="${imageUrl}" width="1280" height="auto"/>
+        `,
+    {
+      onShow: (instance) => {
+        window.addEventListener("keydown", onEscKeyPress);
+      },
+      onClose: (instance) => {
+        window.removeEventListener("keydown", onEscKeyPress);
+      },
+    }
+  );
+  instance.show();
+
+  function onEscKeyPress(event) {
+    const ESC_KEY_CODE = "Escape";
+    const isEscKey = event.code === ESC_KEY_CODE;
+    if (!isEscKey) return;
+    instance.close();
+  }
 }
